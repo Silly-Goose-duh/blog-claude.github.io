@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Reflections | Personal Blog</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --bg-tertiary: #2d2d2d;
+            --text-primary: #f5f5f5;
+            --text-secondary: #aaaaaa;
+            --accent: #bb86fc;
+            --accent-hover: #9966cc;
+            --calendar-cell: #252525;
+            --calendar-hover: #333333;
+            --calendar-today: rgba(187, 134, 252, 0.2);
+            --calendar-has-post: rgba(187, 134, 252, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--bg-secondary);
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            animation: fadeIn 1s ease;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+            position: relative;
+        }
+
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+            display: inline-block;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 100px 0;
+            text-align: center;
+            background-color: var(--bg-primary);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #bb86fc, #3700b3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        /* Calendar Section */
+        .calendar-section {
+            padding: 50px 0;
+            animation: fadeInUp 1s ease;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background-color: var(--accent);
+        }
+
+        .calendar-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .month-navigation {
+            display: flex;
+            align-items: center;
+        }
+
+        .month-navigation button {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: all 0.3s ease;
+        }
+
+        .month-navigation button:hover {
+            color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .current-month {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 15px;
+        }
+
+        .calendar {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .calendar th {
+            padding: 10px;
+            text-align: center;
+            font-weight: normal;
+            color: var(--text-secondary);
+        }
+
+        .calendar td {
+            padding: 0;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day {
+            position: relative;
+            height: 100px;
+            cursor: pointer;
+            background-color: var(--calendar-cell);
+            border-radius: 5px;
+            margin: 3px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .calendar-day:hover {
+            transform: scale(1.05);
+            background-color: var(--calendar-hover);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+        }
+
+        .day-number {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .has-post {
+            background-color: var(--calendar-has-post);
+        }
+
+        .today {
+            background-color: var(--calendar-today);
+            border: 2px solid var(--accent);
+        }
+
+        .other-month {
+            opacity: 0.4;
+        }
+
+        .preview {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 5px;
+            text-align: left;
+            overflow: hidden;
+            font-size: 0.8rem;
+            line-height: 1.2;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .preview h4 {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            color: var(--accent);
+        }
+
+        .calendar-day:hover .preview {
+            display: block;
+        }
+
+        /* Post Detail Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: var(--bg-secondary);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 800px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideInUp 0.5s ease;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--accent);
+        }
+
+        .post-date {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .post-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .post-content {
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-secondary);
+            padding: 30px 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-right: 20px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .social-icons {
+            display: flex;
+        }
+
+        .social-icons a {
+            color: var(--text-secondary);
+            margin-left: 15px;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        /* Mobile Navigation */
+        .mobile-menu-btn {
+            display: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive */
+        @media screen and (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--bg-secondary);
+                padding: 20px;
+                z-index: 100;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                margin: 10px 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .calendar-day {
+                height: 70px;
+            }
+
+            .preview {
+                display: none;
+            }
+
+            .calendar-day:hover .preview {
+                display: none;
+            }
+
+            .footer-content {
+                flex-direction: column;
+            }
+
+            .footer-links {
+                margin-bottom: 20px;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-feather-alt"></i>
+                    <span>Dark Reflections</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#" class="nav-link">Home</a></li>
+                    <li><a href="#" class="nav-link">Archive</a></li>
+                    <li><a href="#" class="nav-link">Categories</a></li>
+                    <li><a href="#" class="nav-link">About</a></li>
+                    <li><a href="#" class="nav-link">Contact</a></li>
+                </ul>
+                <div class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>My Journey Through Life & Code</h1>
+            <p>Welcome to my personal space where I share my thoughts, experiences, and learnings. Explore my daily reflections through the interactive calendar below.</p>
+        </div>
+    </section>
+
+    <!-- Calendar Section -->
+    <section class="calendar-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Blog Calendar</h2>
+            </div>
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="month-navigation">
+                        <button id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                        <h3 class="current-month" id="current-month">March 2025</h3>
+                        <button id="next-month"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <table class="calendar" id="calendar">
+                    <thead>
+                        <tr>
+                            <th>Sun</th>
+                            <th>Mon</th>
+                            <th>Tue</th>
+                            <th>Wed</th>
+                            <th>Thu</th>
+                            <th>Fri</th>
+                            <th>Sat</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calendar-body">
+                        <!-- Calendar days will be generated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Post Detail Modal -->
+    <div class="modal" id="post-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal">&times;</span>
+            <span class="post-date" id="modal-date">March 10, 2025</span>
+            <h2 class="post-title" id="modal-title">This is a sample blog post title</h2>
+            <div class="post-content" id="modal-content">
+                <p>This is where the full blog post content will appear. When you click on a date with a blog post, this modal will open showing the complete content of that post.</p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean euismod bibendum laoreet. Proin gravida dolor sit amet lacus accumsan et viverra justo commodo.</p>
+                <p>Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam id dolor id nibh ultricies vehicula.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <ul class="footer-links">
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Use</a></li>
+                    <li><a href="#">Sitemap</a></li>
+                </ul>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Sample blog posts data
+        const blogPosts = {
+            '2025-03-01': {
+                title: 'Starting a New Month',
+                preview: 'Reflecting on goals for March and planning new projects...',
+                content: `<p>As March begins, I'm setting ambitious goals for the month ahead. Today I reflected on what I want to accomplish in both my personal and professional life.</p>
+                <p>One of my key focuses will be on learning new web animation techniques. I've been fascinated by the creative possibilities that modern CSS and JavaScript offer for creating engaging user experiences.</p>
+                <p>I've also decided to start a daily meditation practice to help maintain focus and mental clarity during busy workdays. Even just 10 minutes each morning seems to make a difference.</p>
+                <p>Looking forward to documenting this journey throughout the month!</p>`
+            },
+            '2025-03-05': {
+                title: 'Breakthrough with React Hooks',
+                preview: 'Finally understanding useContext and useReducer properly...',
+                content: `<p>Today I had a major breakthrough in my understanding of React's more advanced hooks. After struggling for weeks with complex state management, something finally clicked!</p>
+                <p>I was working on a project that required shared state across many components, and I kept running into prop drilling issues. After revisiting the documentation and watching a few tutorials, I finally understood how useContext and useReducer can work together to create a global state management solution without reaching for external libraries.</p>
+                <p>I refactored the entire application to use this pattern, and the code is now much cleaner and more maintainable. It's amazing how satisfying it is when a complex concept finally makes sense.</p>
+                <p>I've created a CodePen demo to remember this pattern for future projects.</p>`
+            },
+            '2025-03-08': {
+                title: 'Weekend Hike and Code Inspiration',
+                preview: 'How nature walks help me solve coding problems...',
+                content: `<p>I took a long hike in the mountains today, and as often happens, I found myself solving coding problems that had been stumping me all week.</p>
+                <p>There's something about being in nature that allows my mind to work in the background on challenges. Without the pressure of staring at the screen, solutions often emerge naturally.</p>
+                <p>During today's hike, I realized a much simpler approach to the animation sequence I've been struggling with. Instead of over-engineering with complex JavaScript, I can achieve a similar effect with CSS keyframes and cubic-bezier timing functions.</p>
+                <p>I took some beautiful photos during the hike as well, which I'm thinking of incorporating into a new website design. The color palette of the forest in early spring is particularly inspiring.</p>`
+            },
+            '2025-03-10': {
+                title: 'Creating My New Blog Platform',
+                preview: 'Building a custom calendar-based blog UI from scratch...',
+                content: `<p>Today I finally started working on a personal project I've been thinking about for months - a custom blog platform with a calendar-based UI.</p>
+                <p>I've always found traditional blog layouts somewhat limiting, and I wanted to create something that better represents how I think about my writing - as daily reflections tied to specific moments in time.</p>
+                <p>The calendar UI allows visitors to see at a glance which days contain entries, and they can quickly preview content before diving into full posts. I'm particularly proud of the animation effects I've implemented, which make navigating between dates feel smooth and intuitive.</p>
+                <p>I chose a dark theme both for aesthetic reasons and to reduce eye strain during evening reading. The purple accent color adds just enough visual interest without becoming distracting.</p>
+                <p>Next steps will be implementing a tagging system and possibly adding a search function to make older entries more discoverable.</p>`
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize calendar
+            generateCalendar();
+
+            // Add event listeners
+            document.getElementById('prev-month').addEventListener('click', function() {
+                changeMonth(-1);
+            });
+
+            document.getElementById('next-month').addEventListener('click', function() {
+                changeMonth(1);
+            });
+
+            document.getElementById('close-modal').addEventListener('click', function() {
+                document.getElementById('post-modal').style.display = 'none';
+            });
+
+            // Mobile menu toggle
+            document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+                document.querySelector('.nav-links').classList.toggle('active');
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === document.getElementById('post-modal')) {
+                    document.getElementById('post-modal').style.display = 'none';
+                }
+            });
+        });
+
+        // Current date tracking
+        let currentDate = new Date();
+        let displayedMonth = currentDate.getMonth();
+        let displayedYear = currentDate.getFullYear();
+
+        // Generate calendar
+        function generateCalendar() {
+            const calendarBody = document.getElementById('calendar-body');
+            calendarBody.innerHTML = '';
+
+            // Update month/year display
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('current-month').textContent = `${monthNames[displayedMonth]} ${displayedYear}`;
+
+            // Get first day of month and number of days
+            const firstDay = new Date(displayedYear, displayedMonth, 1);
+            const lastDay = new Date(displayedYear, displayedMonth + 1, 0);
+            
+            // Get day of week for first day (0-6, Sunday-Saturday)
+            let firstDayOfWeek = firstDay.getDay();
+            
+            // Calculate previous month days to display
+            const prevMonthLastDay = new Date(displayedYear, displayedMonth, 0).getDate();
+            
+            // Create calendar rows
+            let date = 1;
+            let nextMonthDate = 1;
+            
+            // Create 6 rows to ensure enough space for all months
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('tr');
+                
+                // Create 7 cells for each day of the week
+                for (let j = 0; j < 7; j++) {
+                    const cell = document.createElement('td');
+                    const dayDiv = document.createElement('div');
+                    dayDiv.className = 'calendar-day';
+                    
+                    if (i === 0 && j < firstDayOfWeek) {
+                        // Previous month days
+                        const prevDate = prevMonthLastDay - (firstDayOfWeek - j - 1);
+                        const dayNumber = document.createElement('div');
+                        dayNumber.className = 'day-number';
+                        dayNumber.textContent = prevDate;
+                        dayDiv.appendChild(dayNumber);
+                        dayDiv.classList.add('other-month');
+                        
+                        const prevMonthDate = `${displayedYear}-${String(displayedMonth).padStart(2, '0')}-${String(prevDate).padStart(2, '0')}`;
+                        setupDayDiv(dayDiv, prevMonthDate);
+                    } else if (date > lastDay.getDate()) {
+                        // Next month days
+                        const dayNumber = document.createElement('div');
+                        dayNumber.className = 'day-number';
+                        dayNumber.textContent = nextMonthDate;
+                        dayDiv.appendChild(dayNumber);
+                        dayDiv.classList.add('other-month');
+                        
+                        const nextMonthDateStr = `${displayedYear}-${String(displayedMonth + 2).padStart(2, '0')}-${String(nextMonthDate).padStart(2, '0')}`;
+                        setupDayDiv(dayDiv, nextMonthDateStr);
+                        
+                        nextMonthDate++;
+                    } else {
+                        // Current month days
+                        const dayNumber = document.createElement('div');
+                        dayNumber.className = 'day-number';
+                        dayNumber.textContent = date;
+                        dayDiv.appendChild(dayNumber);
+                        
+                        const fullDate = `${displayedYear}-${String(displayedMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                        
+                        // Check if current day
+                        const today = new Date();
+                        if (date === today.getDate() && displayedMonth === today.getMonth() && displayedYear === today.getFullYear()) {
+                            dayDiv.classList.add('today');
+                        }
+                        
+                        setupDayDiv(dayDiv, fullDate);
+                        
+                        date++;
+                    }
+                    
+                    cell.appendChild(dayDiv);
+                    row.appendChild(cell);
+                }
+                
+                calendarBody.appendChild(row);
+                
+                // Stop creating rows if we've displayed all days
+                if (date > lastDay.getDate() && i > 3) break;
+            }
+            
+            // Add animation to the calendar cells with staggered delay
+            const cells = document.querySelectorAll('.calendar-day');
+            cells.forEach((cell, index) => {
+                cell.style.animationDelay = `${index * 0.03}s`;
+                cell.style.animation = 'fadeInUp 0.5s ease forwards';
+            });
+        }
+
+        function setupDayDiv(dayDiv, dateString) {
+            // Check if this date has a blog post
+            if (blogPosts[dateString]) {
+                dayDiv.classList.add('has-post');
+                
+                // Create preview
+                const preview = document.createElement('div');
+                preview.className = 'preview';
+                
+                const previewTitle = document.createElement('h4');
+                previewTitle.textContent = blogPosts[dateString].title;
+                
+                const previewContent = document.createElement('p');
+                previewContent.textContent = blogPosts[dateString].preview;
+                
+                preview.appendChild(previewTitle);
+                preview.appendChild(previewContent);
+                dayDiv.appendChild(preview);
+                
+                // Add click event to open modal
+                dayDiv.addEventListener('click', function() {
+                    openPostModal(dateString);
+                });
+            }
+        }
+
+        function openPostModal(dateString) {
+            if (!blogPosts[dateString]) return;
+            
+            const post = blogPosts[dateString];
+            
+            // Format date for display
+            const date = new Date(dateString);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = date.toLocaleDateString('en-US', options);
+            
+            // Update modal content
+            document.getElementById('modal-date').textContent = formattedDate;
+            document.getElementById('modal-title').textContent = post.title;
+            document.getElementById('modal-content').innerHTML = post.content;
+            
+            // Show modal with animation
+            const modal = document.getElementById('post-modal');
+            modal.style.display = 'block';
+            
+            // Add animation to modal content
+            const modalContent = document.querySelector('.modal-content');
+            modalContent.style.animation = 'slideInUp 0.5s ease';
+        }
+
+        function changeMonth(delta) {
+            displayedMonth += delta;
+            
+            if (displayedMonth < 0) {
+                displayedMonth = 11;
+                displayedYear--;
+            } else if (displayedMonth > 11) {
+                displayedMonth = 0;
+                displayedYear++;
+            }
+            
+            generateCalendar();
+        }
+    </script>
+</body>
+</html>
